@@ -53,10 +53,13 @@ def run_command(command: str):
         raise RuntimeError(f" Command failed: {command} (Exit code: {result.returncode})")
 
 
-def setup_shadcn():
+def setup_shadcn(usingToast: bool):
     using_pnpm = False
+    shadcn = "shadcn" if usingToast else "shadcn@latest"
+    default_options = "" if usingToast else "-t next -b neutral --cwd ."
 
-    if using_pnpm: 
+
+    if using_pnpm:
         try:
             run_command("npm i pnpm")
             run_command("pnpm --version")
@@ -66,11 +69,11 @@ def setup_shadcn():
             using_pnpm = False
 
     try:
-        cmd = "pnpm dlx shadcn@latest init -t next -b neutral --cwd ." if using_pnpm \
-              else "npx shadcn@latest init -t next -b neutral --cwd ."
+        cmd = f"pnpm dlx {shadcn} init {default_options}" if using_pnpm \
+              else f"npx {shadcn} init {default_options}"
         run_command(f"echo \".\" | {cmd}")
 
-        add_cmd = "pnpm dlx shadcn@latest add -a" if using_pnpm else "npx shadcn@latest add -a"
+        add_cmd = f"pnpm dlx {shadcn} add -a" if using_pnpm else f"npx {shadcn} add -a"
         run_command(add_cmd)
 
         print("\033[32m ShadCN setup complete.\033[0m")
@@ -90,7 +93,7 @@ def extract_files_from_markdown(content: str):
 
     return results
 
-ignore_dependencies = [] 
+ignore_dependencies = []
 blacklist_prefixes = ("next/")
 
 def install_third_party_dependencies(files):
@@ -111,7 +114,7 @@ def install_third_party_dependencies(files):
                     dependencies.add(f"{scope}/{name}")
                 else:
                     dependencies.add(dep)
-                
+
     if dependencies:
         deps_string = " ".join(dependencies)
         print(f"\033[36m Detected dependencies: {deps_string}\033[0m")
@@ -165,16 +168,27 @@ def process_markdown_project():
     project_root.mkdir(parents=True)
     print(f"\033[32m Created project folder: {project_root}\033[0m")
 
+    # find out if content has an import like this "@/components/ui/toast" or "@/components/ui/toaster"
+
+    usingToast = False
+
+    if "@/components/ui/toast" in content or "@/components/ui/toaster" in content:
+        usingToast = True
+
+    if usingToast:
+        print("\033[32m Toast is enabled.\033[0m")
+        run_command("npm install shadcn@v2.3.0")
+
     os.chdir(project_root)
     print(f" Changed working directory to: {project_root}")
 
-    setup_shadcn()
+    setup_shadcn(usingToast)
 
     project_files = extract_files_from_markdown(content)
     write_project_files(project_files)
 
     install_third_party_dependencies(project_files)
-    
+
 
 if __name__ == "__main__":
     try:
@@ -187,7 +201,7 @@ if __name__ == "__main__":
         #     reinstall_npm_package("zod", pkg_data)
         # else:
         #     print("\033[33m package.json not found. Skipping reinstall step.\033[0m")
-        
+
         print("\033[32m All setup complete. Launching dev server...\033[0m")
         run_command("npm run dev")
 
@@ -197,4 +211,3 @@ if __name__ == "__main__":
     except Exception as err:
         print(f"\033[31m Unexpected exception:\033[0m {err}")
         sys.exit(1)
-
