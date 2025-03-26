@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "pnpm": "^10.6.5",
+    "pnpm": "^10.7.0",
     "shadcn": "^2.3.0"
   }
 }

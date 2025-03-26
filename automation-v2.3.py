@@ -73,7 +73,6 @@ def setup_shadcn(usingToast: bool, using_pnpm: bool):
         print("\033[31m Failed to initialize ShadCN:", str(e), "\033[0m")
         raise
 
-
 def extract_files_from_markdown(content: str):
     pattern = r'```[a-zA-Z0-9]+\s+file="([^"]*)"\n([\s\S]*?)```'
     results = re.findall(pattern, content)
