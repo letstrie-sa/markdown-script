@@ -63,7 +63,7 @@ def setup_shadcn(usingToast: bool, using_pnpm: bool):
               else f"npx {shadcn} init {default_options}"
         run_command(f"{cmd}")
 
-        add_cmd = f"pnpm dlx {shadcn} add" if using_pnpm else f"npx {shadcn} add -a"
+        add_cmd = f"pnpm dlx {shadcn} add -a" if using_pnpm else f"npx {shadcn} add -a"
         run_command(add_cmd)
 
         print("\033[32m ShadCN setup complete.\033[0m")
@@ -72,7 +72,7 @@ def setup_shadcn(usingToast: bool, using_pnpm: bool):
         raise
 
 def extract_files_from_markdown(content: str):
-    pattern = r'```[a-zA-Z0-9]+\s+file="([^"]*)"\n([\s\S]*?)```'
+    pattern = r'```[a-zA-Z0-9]+\s+file\s*=\s*"([^"]*)"\n([\s\S]*?)```'
     results = re.findall(pattern, content)
 
     for file, _ in results:
