@@ -63,7 +63,7 @@ def setup_shadcn(usingToast: bool, using_pnpm: bool):
     try:
         cmd = f"pnpm dlx {shadcn} init {default_options}" if using_pnpm \
               else f"npx {shadcn} init {default_options}"
-        run_command(f"echo \".\" | {cmd}")
+        run_command(f"{cmd}")
 
         add_cmd = f"pnpm dlx {shadcn} add" if using_pnpm else f"npx {shadcn} add -a"
         run_command(add_cmd)
