@@ -54,11 +54,11 @@ def run_command(command: str):
 
 
 def setup_shadcn():
-    using_pnpm = False
+    using_pnpm = True
 
     if using_pnpm: 
         try:
-            run_command("npm i pnpm")
+            run_command("npm i -g pnpm")
             run_command("pnpm --version")
             print("\033[32m pnpm is installed.\033[0m")
         except Exception:
