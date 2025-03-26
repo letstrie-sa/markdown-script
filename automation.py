@@ -52,28 +52,20 @@ def run_command(command: str):
     if result.returncode != 0:
         raise RuntimeError(f" Command failed: {command} (Exit code: {result.returncode})")
 
-
-def setup_shadcn(usingToast: bool):
-    using_pnpm = False
-    shadcn = "shadcn" if usingToast else "shadcn@latest"
+def setup_shadcn(usingToast: bool, using_pnpm: bool):
+    shadcn = "shadcn@latest"
+    if usingToast:
+        shadcn = "shadcn"
+    if using_pnpm and usingToast:
+        shadcn = "shadcn@2.3.0"
     default_options = "" if usingToast else "-t next -b neutral --cwd ."
-
-
-    if using_pnpm:
-        try:
-            run_command("npm i pnpm")
-            run_command("pnpm --version")
-            print("\033[32m pnpm is installed.\033[0m")
-        except Exception:
-            print("\033[33m pnpm installation failed. Falling back to npm.\033[0m")
-            using_pnpm = False
 
     try:
         cmd = f"pnpm dlx {shadcn} init {default_options}" if using_pnpm \
               else f"npx {shadcn} init {default_options}"
         run_command(f"echo \".\" | {cmd}")
 
-        add_cmd = f"pnpm dlx {shadcn} add -a" if using_pnpm else f"npx {shadcn} add -a"
+        add_cmd = f"pnpm dlx {shadcn} add" if using_pnpm else f"npx {shadcn} add -a"
         run_command(add_cmd)
 
         print("\033[32m ShadCN setup complete.\033[0m")
@@ -175,14 +167,28 @@ def process_markdown_project():
     if "@/components/ui/toast" in content or "@/components/ui/toaster" in content:
         usingToast = True
 
-    if usingToast:
-        print("\033[32m Toast is enabled.\033[0m")
-        run_command("npm install shadcn@v2.3.0")
+    using_pnpm = True
+
+    if using_pnpm:
+        try:
+            run_command("npm i pnpm")
+            run_command("pnpm --version")
+            print("\033[32m pnpm is installed.\033[0m")
+        except Exception:
+            print("\033[33m pnpm installation failed. Falling back to npm.\033[0m")
+            using_pnpm = False
+
+    shadcn = "shadcn" if usingToast else "shadcn@latest"
+
+    if using_pnpm:
+        run_command(f"pnpm add -g {shadcn}")
+    else:
+        run_command(f"npm install -g {shadcn}")
 
     os.chdir(project_root)
     print(f" Changed working directory to: {project_root}")
 
-    setup_shadcn(usingToast)
+    setup_shadcn(usingToast, using_pnpm)
 
     project_files = extract_files_from_markdown(content)
     write_project_files(project_files)
