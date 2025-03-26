@@ -53,12 +53,10 @@ def run_command(command: str):
         raise RuntimeError(f" Command failed: {command} (Exit code: {result.returncode})")
 
 def setup_shadcn(usingToast: bool, using_pnpm: bool):
-    shadcn = "shadcn@latest"
-    if usingToast:
+    shadcn = "shadcn@2.3.0"
+    if using_pnpm == False:
         shadcn = "shadcn"
-    if using_pnpm and usingToast:
-        shadcn = "shadcn@2.3.0"
-    default_options = "" if usingToast else "-t next -b neutral --cwd ."
+    default_options = ""
 
     try:
         cmd = f"pnpm dlx {shadcn} init {default_options}" if using_pnpm \
@@ -177,12 +175,11 @@ def process_markdown_project():
             print("\033[33m pnpm installation failed. Falling back to npm.\033[0m")
             using_pnpm = False
 
-    shadcn = "shadcn" if usingToast else "shadcn@latest"
 
     if using_pnpm:
-        run_command(f"pnpm add -g {shadcn}")
+        run_command("pnpm add -g shadcn@2.3.0")
     else:
-        run_command(f"npm install -g {shadcn}")
+        run_command("npm install -g shadcn@2.3.0")
 
     os.chdir(project_root)
     print(f" Changed working directory to: {project_root}")
