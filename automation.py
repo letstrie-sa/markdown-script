@@ -152,6 +152,10 @@ def process_markdown_project():
     markdown_file = prompt_for_markdown_file()
     print(f" Reading markdown file: {markdown_file}")
     content = read_markdown(markdown_file)
+    
+    if "@/components/ui/toast" in content or "@/components/ui/toaster" in content:
+        print("\033[33m Detected deprecated toast components. Please update to the latest version.\033[0m")
+        sys.exit(1)
 
     file_name = Path(markdown_file).stem
     project_slug = slugify(file_name)
