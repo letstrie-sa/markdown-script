@@ -99,8 +99,11 @@ def install_third_party_dependencies(files):
                 if "/" in dep: # Handle scenerios like "@hookform/resolvers/zod"
                     parts = dep.split("/")
                     scope = parts[0]
-                    name = parts[1] if len(parts) > 1 else ""
-                    dependencies.add(f"{scope}/{name}")
+                    name = parts[1]
+                    if scope.startswith("@"):
+                        dependencies.add(f"{scope}/{name}")
+                    else:
+                        dependencies.add(scope)
                 else:
                     dependencies.add(dep)
 
